@@ -8,6 +8,7 @@ import {
 } from "./validators/statementValidator";
 import { env } from "./config/env";
 import { conversationManager } from "./state/conversationState";
+import axios from 'axios';
 
 const app = express();
 
@@ -43,7 +44,7 @@ app.post(
         }
       }
       const response = await openAIClient.generateResponse(prompt);
-
+      
       if (conversationId && conversation) {
         try {
           conversation = conversationManager.addMessageToConversation(
@@ -59,12 +60,26 @@ app.post(
           response,
         });
       }
+      let cronosResponse = null;
+      try {
+        const { data } = await axios.post(`${env.CRONOS_URL}/conversation`, {
+          context: response
+        });
+        cronosResponse = {
+          summary: data.response.summary,
+          messages: data.response.messages
+        }
+      } catch (error) {
+        console.error('Failed to send response to webhook:', error);
+      }
 
       res.json({
         conversationId: conversation.id,
         response,
         conversation,
+        cronosResponse
       });
+
     } catch (error) {
       console.error("Error processing statement:", error);
       res.status(500).json({ error: "Internal server error" });

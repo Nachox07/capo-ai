@@ -2,7 +2,7 @@ import { z } from 'zod';
 import dotenv from 'dotenv';
 
 // Load the appropriate .env file based on NODE_ENV
-const envFile = process.env.NODE_ENV === 'test' 
+const envFile = process.env.NODE_ENV === 'development' 
   ? '.env.test'
   : process.env.NODE_ENV === 'production'
     ? '.env.production'
@@ -15,6 +15,7 @@ const envSchema = z.object({
   PORT: z.string().default('3000'),
   OPENAI_API_KEY: z.string().min(1, 'OpenAI API key is required'),
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
+  CRONOS_URL: z.string().min(1, 'Cronos URL is required'),
 });
 
 // Validate environment variables

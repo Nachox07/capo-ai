@@ -1,5 +1,7 @@
 # ... existing entries ...
 .env*
 !.env.example 
+**/dist/
+
 
 node_modules
