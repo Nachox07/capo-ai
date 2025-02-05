@@ -1,0 +1,5 @@
+# ... existing entries ...
+.env*
+!.env.example 
+
+node_modules
