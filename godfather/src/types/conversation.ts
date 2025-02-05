@@ -1,7 +1,8 @@
 export interface Message {
   id: string;
   prompt: string;
-  response: string;
+  response?: string;
+  query?: string;
   timestamp: Date;
 }
 
@@ -14,4 +15,4 @@ export interface Conversation {
 
 export interface ConversationState {
   conversations: Conversation[];
-} 
+}
