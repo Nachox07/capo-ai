@@ -10,7 +10,9 @@ class ConversationManager {
     conversations: [],
   };
 
-  createConversation(initialMessage: { prompt: string }): Conversation {
+  createConversation(
+    initialMessage: Pick<Message, "prompt" | "promptType">
+  ): Conversation {
     const conversation: Conversation = {
       id: this.state.conversations.length + 1,
       messages: [

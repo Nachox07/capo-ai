@@ -4,6 +4,7 @@ export interface Message {
   response?: string;
   query?: string;
   timestamp: Date;
+  promptType?: string;
 }
 
 export interface Conversation {

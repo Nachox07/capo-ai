@@ -11,12 +11,9 @@ export class OpenAIClient implements AIClient {
   async generateResponse(prompt: string): Promise<string> {
     try {
       const response = await this.client.chat.completions.create({
-        messages: [
-          { role: "system", content: "You are a helpful assistant that determines if enough information has been provided to answer a query. If information is missing, you specify exactly what additional details are needed." },
-          { role: "user", content: prompt }
-        ],
+        messages: [{ role: "user", content: prompt }],
         model: "gpt-4",
-        temperature: 0.7
+        temperature: 0.7,
       });
 
       return response.choices[0]?.message?.content || "";
