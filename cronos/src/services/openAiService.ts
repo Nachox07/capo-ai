@@ -32,7 +32,21 @@ export class OpenAiService {
       - If resolved, provide a clear summary of the result and any pending actions.
     `;
 
+    const MAX_TURNS = 10;
+    let turnCount = 0;
+
     while (!conversationComplete) {
+      if (turnCount >= MAX_TURNS) {
+        return {
+          resolved: false,
+          summary: 'The conversation reached maximum allowed turns without resolution.',
+          messages: messages,
+          reply: response
+        };
+      }
+      
+      turnCount++;
+
       const completion = await this.openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
@@ -72,21 +86,19 @@ export class OpenAiService {
         };
       } else {
         messages.push({ role: 'bot', content: response });
+        
+        const webhookResponse = await this.webhookService.sendRequest({
+          userId,
+          sessionId,
+          text: response,
+        });
+
+        console.log('Response from webhook:', webhookResponse);
+
+        messages.push({ role: 'support', content: webhookResponse || 'No response' });
+
+        currentContext = `Previous context:\n${currentContext}\nBot's response:\n${response}\nCustomer support input:\n${webhookResponse}`;
       }
-
-      const webhookResponse = await this.webhookService.sendRequest({
-        userId,
-        sessionId,
-        text: response,
-      });
-
-      console.log('Response from webhook:', webhookResponse);
-
-      messages.push({ role: 'support', content: webhookResponse || 'No response' });
-
-      currentContext = `Previous context:\n${currentContext}\nBot's response:\n${response}\nCustomer support input:\n${webhookResponse}`;
-
-      conversationComplete = false;
     }
 
     return {
