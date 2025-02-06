@@ -16,7 +16,7 @@ export async function statementHandler(
     let conversation;
     let query = "";
     let chronosResponse;
-    const TO_SUBMIT_REQUEST_TEXT = "Yes, submit the request";
+    const TO_SUBMIT_REQUEST_TEXT = "Request submitted.";
     if (!conversationId) {
       conversation = conversationManager.createConversation({ prompt });
       query = `${prompt} Please tell me the necessary information to provide to airline customer service.\
@@ -37,9 +37,9 @@ export async function statementHandler(
         const responses = messages
           .map(message => message.response)
           .join(" ");
-        query = `My problem statement was "${problemStatement}" and the responses were "${responses}". : Do I have all the information I need to resolve this query?. If yes, then respond with only text ${TO_SUBMIT_REQUEST_TEXT}, else ask for the missing information."`;
+        query = `My problem statement was "${problemStatement}" and the responses were "${responses}". : Do I have all the information I need to resolve this query?. If yes, then respond with only text ${TO_SUBMIT_REQUEST_TEXT}, else list up the missing information without saying No."`;
 
-        console.debug("######query : ", query)
+        // console.debug("######query : ", query)
       }
     }
     const messageUpdateId =

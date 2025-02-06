@@ -47,7 +47,7 @@ const handleChatSelect = (chatId: string) => {
   activeChat.value = chatId;
 };
 
-const API_URL = "https://a3bc97d73f7a.ngrok.app/statement";
+const API_URL = "http://localhost:3000/statement";
 
 const handleSubmit = async (e: Event) => {
   e.preventDefault();
@@ -106,9 +106,10 @@ const handleSubmit = async (e: Event) => {
     }
 
     const data = await response.json();
+    const messagesLength = data.messages.length;
 
-    if (!chats.value[currentChatIndex].conversationId && data.conversationId) {
-      chats.value[currentChatIndex].conversationId = data.conversationId;
+    if (!chats.value[currentChatIndex].conversationId && data.id) {
+      chats.value[currentChatIndex].conversationId = data.id;
     }
 
     // Store transcript messages if they exist in the response
@@ -116,9 +117,10 @@ const handleSubmit = async (e: Event) => {
       chats.value[currentChatIndex].transcriptMessages = data.messages;
     }
 
+
     const assistantMessage: ChatMessage = {
       role: "assistant",
-      content: data.response,
+      content: data.messages[messagesLength-1].response,
     };
 
     chats.value[currentChatIndex].messages.push(assistantMessage);
