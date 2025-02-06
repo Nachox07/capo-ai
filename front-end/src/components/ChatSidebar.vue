@@ -11,7 +11,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "newChat"): void;
   (e: "deleteChat", chatId: string): void;
-  (e: "view-transcript", chatId: string): void;
 }>();
 
 const handleNewChat = () => {
@@ -21,10 +20,6 @@ const handleNewChat = () => {
 const handleDeleteChat = (chatId: string, event: Event) => {
   event.stopPropagation(); // Prevent chat selection when clicking delete
   emit("deleteChat", chatId);
-};
-
-const handleViewTranscript = (chatId: string) => {
-  emit("view-transcript", chatId);
 };
 </script>
 
@@ -68,39 +63,6 @@ const handleViewTranscript = (chatId: string) => {
         <div class="font-medium truncate pr-6">{{ chat.title }}</div>
         <div class="text-sm text-gray-500 truncate">{{ chat.lastMessage }}</div>
         <div class="text-xs text-gray-400 mt-1">{{ chat.timestamp }}</div>
-
-        <!-- Transcript button - only show if chat has transcriptMessages -->
-        <button
-          v-if="chat.transcriptMessages?.length"
-          @click.stop="handleViewTranscript(chat.id)"
-          class="absolute right-2 top-2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 hover:bg-blue-50 transition-opacity"
-          :class="[
-            activeChat === chat.id
-              ? 'text-blue-600'
-              : 'text-gray-400 hover:text-blue-600',
-          ]"
-          title="View Transcript"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-4 h-4"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"
-            />
-            <path
-              fill-rule="evenodd"
-              d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </button>
 
         <!-- Delete button -->
         <button

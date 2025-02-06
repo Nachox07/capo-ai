@@ -16,4 +16,5 @@ export interface Chat {
   messages: ChatMessage[];
   conversationId: string | null;
   transcriptMessages?: TranscriptMessage[];
+  summary?: string;
 } 

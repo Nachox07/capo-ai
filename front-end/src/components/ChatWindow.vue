@@ -3,12 +3,15 @@ import { ref, onMounted, computed } from "vue";
 import type { ChatMessage, Chat } from "../types/chat";
 import ChatSidebar from "./ChatSidebar.vue";
 import TranscriptPage from "./TranscriptPage.vue";
+import SummaryPage from "./SummaryPage.vue";
 
 const input = ref("");
 const isLoading = ref(false);
 const activeChat = ref<string | null>(null);
 const showTranscript = ref(false);
 const selectedTranscriptChat = ref<string | null>(null);
+const showSummary = ref(false);
+const selectedSummaryChat = ref<string | null>(null);
 
 // Enhanced chats data structure with messages
 const chats = ref<Chat[]>([
@@ -112,15 +115,20 @@ const handleSubmit = async (e: Event) => {
       chats.value[currentChatIndex].conversationId = data.id;
     }
 
-    // Store transcript messages if they exist in the response
-    if (data.messages) {
-      chats.value[currentChatIndex].transcriptMessages = data.messages;
+    // Update where we store transcript messages
+    if (data.submittedResponse?.messages) {
+      chats.value[currentChatIndex].transcriptMessages =
+        data.submittedResponse.messages;
     }
 
+    // Store summary if it exists in the submittedResponse
+    if (data.submittedResponse?.summary) {
+      chats.value[currentChatIndex].summary = data.submittedResponse.summary;
+    }
 
     const assistantMessage: ChatMessage = {
       role: "assistant",
-      content: data.messages[messagesLength-1].response,
+      content: data.messages[messagesLength - 1].response,
     };
 
     chats.value[currentChatIndex].messages.push(assistantMessage);
@@ -174,14 +182,35 @@ const handleDeleteChat = (chatId: string) => {
   }
 };
 
-const handleViewTranscript = (chatId: string) => {
-  selectedTranscriptChat.value = chatId;
-  showTranscript.value = true;
-};
-
 const handleCloseTranscript = () => {
   showTranscript.value = false;
   selectedTranscriptChat.value = null;
+};
+
+const emit = defineEmits<{
+  (e: "send-message", message: string): void;
+  (e: "view-summary", chatId: string): void;
+}>();
+
+const handleViewTranscript = () => {
+  if (activeChat.value) {
+    selectedTranscriptChat.value = activeChat.value;
+    showTranscript.value = true;
+  }
+};
+
+// Add handler for summary
+const handleViewSummary = () => {
+  if (activeChat.value) {
+    selectedSummaryChat.value = activeChat.value;
+    showSummary.value = true;
+  }
+};
+
+// Add handler to close summary
+const handleCloseSummary = () => {
+  showSummary.value = false;
+  selectedSummaryChat.value = null;
 };
 </script>
 
@@ -197,11 +226,67 @@ const handleCloseTranscript = () => {
     />
 
     <div class="flex-1 mx-auto px-4 py-6">
-      <h1
-        class="mb-8 text-center text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
-      >
-        CAPO.AI
-      </h1>
+      <div class="flex justify-between items-center mb-4">
+        <h1
+          class="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
+        >
+          CAPO.AI
+        </h1>
+
+        <div class="flex gap-2">
+          <button
+            v-if="activeChat && chats.find((c) => c.id === activeChat)?.summary"
+            @click="handleViewSummary"
+            class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            title="View Summary"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+              />
+            </svg>
+          </button>
+
+          <button
+            v-if="
+              activeChat &&
+              chats.find((c) => c.id === activeChat)?.transcriptMessages?.length
+            "
+            @click="handleViewTranscript"
+            class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            title="View Transcript"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-5 h-5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"
+              />
+              <path
+                fill-rule="evenodd"
+                d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
 
       <!-- Chat messages -->
       <div
@@ -292,5 +377,11 @@ const handleCloseTranscript = () => {
       []
     "
     :on-close="handleCloseTranscript"
+  />
+
+  <SummaryPage
+    v-if="showSummary && selectedSummaryChat"
+    :summary="chats.find((c) => c.id === selectedSummaryChat)?.summary || ''"
+    :on-close="handleCloseSummary"
   />
 </template>
