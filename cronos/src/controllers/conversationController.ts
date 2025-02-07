@@ -10,7 +10,7 @@ export class ConversationController {
 
   handleConversation = async (req: Request, res: Response): Promise<void> => {
     try {
-      console.log('Received request:', req.body);
+      // console.log('Received request:', req.body);
 
       const { context } = req.body;
 
@@ -20,7 +20,12 @@ export class ConversationController {
         return;
       }
 
-      const result = await this.openAiService.processConversation(context);
+      // @ts-ignore
+      const messages = JSON.parse(context).messages[0].query
+
+      console.log('messages : ', messages)
+
+      const result = await this.openAiService.processConversation(messages);
       res.status(200).json({ response: result });
     } catch (error) {
       console.error('Error processing conversation:', error);

@@ -32,7 +32,7 @@ export class OpenAiService {
       - If resolved, provide a clear summary of the result and any pending actions.
     `;
 
-    const MAX_TURNS = 10;
+    const MAX_TURNS = 30;
     let turnCount = 0;
 
     while (!conversationComplete) {

@@ -58,6 +58,7 @@ export async function statementHandler(
     if (response.includes(TO_SUBMIT_REQUEST_TEXT)) {
       console.debug("submitting request to cronos")
       chronosResponse = await submitRequestToCronos(conversation);
+      console.debug("cronos response : ", chronosResponse)
     }
     res.json({ ...conversation, submittedResponse: chronosResponse });
   } catch (error) {

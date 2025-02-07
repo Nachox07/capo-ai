@@ -50,7 +50,7 @@ const handleChatSelect = (chatId: string) => {
   activeChat.value = chatId;
 };
 
-const API_URL = "http://localhost:3000/statement";
+const API_URL = "http://localhost:3002/statement";
 
 const handleSubmit = async (e: Event) => {
   e.preventDefault();

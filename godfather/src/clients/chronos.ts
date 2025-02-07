@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import { Conversation } from "../types/conversation";
 
 export async function submitRequestToCronos(context: Conversation) {
+  console.debug("url : ", `${process.env.CRONOS_URL}/conversation`)
   return await axios
     .post(`${process.env.CRONOS_URL}/conversation`, {
       context: JSON.stringify(context),
